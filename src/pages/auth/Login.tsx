@@ -34,15 +34,13 @@ const Login = () => {
         setLoading(true);
         setServerErrors({});
 
-        await api.get('/sanctum/csrf-cookie', { withCredentials: true });
-
         try {
 
             await api.get('/sanctum/csrf-cookie');
             
             const response = await api.post('/login', {
                 email,
-                password    
+                password
             });
 
             if (response.data.success) {

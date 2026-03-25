@@ -31,13 +31,19 @@ const AdminNavBar = () => {
                 <Navbar.Toggle aria-controls="basic-navbar-nav"/>
                 <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
                     <Nav>
-                        {/* Ejemplo: Solo mostrar este link si es Administrador */}
+                        {/* Ejemplo: Solo mostrar este link si es Administrador 
                         {hasRole('Administrador') && (
                             <Nav.Link href="#admin-settings">Configuración</Nav.Link>
-                        )}
+                        )}*/}
+
+                        <Nav.Link href="#whatssap">Whatssap</Nav.Link>
+                        <Nav.Link href="#soporte">Soporte</Nav.Link>
+                        <Nav.Link href="#mensajes">Mensajes</Nav.Link>
 
                         <NavDropdown title={user?.name || "Usuario"} id="basic-nav-dropdown">
-                            <NavDropdown.Item href="#perfil">Perfil</NavDropdown.Item>
+                            <NavDropdown.Item href="#cambia-contrasena">Cambiar contraseña</NavDropdown.Item>
+                            <NavDropdown.Item href="#cambia-idioma">Cambiar idioma</NavDropdown.Item>
+                            <NavDropdown.Item href="#Apariencia">Apariencia</NavDropdown.Item>
                             <NavDropdown.Divider />
                             <NavDropdown.Item onClick={handleLogout}>
                                 Cerrar sesión
