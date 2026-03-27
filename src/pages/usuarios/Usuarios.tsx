@@ -1,16 +1,19 @@
-import { Table, Spinner, Navbar, Form, Button, Container, Collapse, Badge, Pagination } from 'react-bootstrap';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { LuUserRoundPlus } from "react-icons/lu";
-import { BiSearchAlt } from "react-icons/bi";
+import { Table, Spinner, Navbar, Form, Button, Container, Collapse, Badge, Pagination } from 'react-bootstrap';
 import { useSearchStore } from "../../store/useSearchStore";
 import { useUsers } from "../../hooks/useUsers";
-import { useState, useEffect } from 'react';
+import { useActivateUser } from "../../hooks/useActivateUser";
+import { LuUserRoundPlus } from "react-icons/lu";
+import { BiSearchAlt } from "react-icons/bi";
+import { FaToggleOff } from "react-icons/fa6";
+import { FaToggleOn } from "react-icons/fa";
 
 interface Usuario {
 	id: number;
 	name: string;
 	email: string;
-	active: string;
+	active: number;
 	roles: Role[];
 }
 
@@ -24,13 +27,15 @@ const Usuarios = () => {
   	const { search, setSearch, showSearch, toggleSearch } = useSearchStore();
 	const [inputValue, setInputValue] = useState(search);
 	const [currentPage, setCurrentPage] = useState(1);
+	const activateMutation = useActivateUser();
+	
  	
 	useEffect(() => {
 		
 		const timer = setTimeout(() => {
 			setSearch(inputValue);
 			setCurrentPage(1);
-		}, 400); // espera 400ms
+		}, 400);
 
 		return () => clearTimeout(timer);
 		
@@ -45,11 +50,15 @@ const Usuarios = () => {
         setCurrentPage(newPage);
     };
 
+	const activateUser = async (userId: number) => {
+		activateMutation.mutate(userId);
+	}
+
 	if (isLoading && !data) {
         return <Spinner animation="border" variant="secondary" className="d-block mx-auto mt-5" />;
     }
 
-  	return (
+	return (
 		<div>
 
 			<Navbar className="mb-3" expand="lg" bg="secondary" data-bs-theme="light">
@@ -119,19 +128,17 @@ const Usuarios = () => {
 						<tr>
 							<th>Usuario</th>
 							<th>Email</th>
-							<th className="text-center">Estado</th>
 							<th className="text-center">Roles</th>
+							<th className="text-center"></th>
 						</tr>
 						</thead>
 
 						<tbody>
 						{usuarios?.map((u: Usuario) => (
+							
 							<tr key={u.id}>
 							<td>{u.name}</td>
 							<td>{u.email}</td>
-							<td className="text-center">
-								{u.active == '1' ? 'Activo' : 'Inactivo'}
-							</td>
 							<td>
 								{u.roles.map((role) => (
 								<Badge bg="primary" className="me-1" key={role.id}>
@@ -139,6 +146,17 @@ const Usuarios = () => {
 								</Badge>
 								))}
 							</td>
+							<td className="text-center">
+								<Button
+									size="sm"
+									variant="outline-secondary"
+									disabled={activateMutation.isPending}
+									onClick={() => activateUser(u.id)}
+								>
+  									{u.active === 1 ? <FaToggleOn /> : <FaToggleOff />}
+								</Button>
+							</td>
+							
 							</tr>
 						))}
 						</tbody>

@@ -6,10 +6,10 @@ export const useUsers = (search: string, page: number) => {
     queryKey: ['users', search, page],
     queryFn: async () => {
         const response = await api.get(`api/admin/users?search=${search}&page=${page}`);
-        return response.data; // Esto devuelve el objeto completo con "data" y "meta"
+        return response.data;
     },
     placeholderData: (prev) => prev,
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: true,
     staleTime: 1000 * 60 * 5,
   });
 };
