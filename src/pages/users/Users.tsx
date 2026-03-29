@@ -8,6 +8,7 @@ import { LuUserRoundPlus } from "react-icons/lu";
 import { BiSearchAlt } from "react-icons/bi";
 import { FaToggleOff } from "react-icons/fa6";
 import { FaToggleOn } from "react-icons/fa";
+import { LiaUserEditSolid } from "react-icons/lia";
 
 interface Usuario {
 	id: number;
@@ -147,7 +148,11 @@ const Usuarios = () => {
 								))}
 							</td>
 							<td className="text-center">
+								<Link to={`/user/show/${u.id}`} className="btn btn-sm btn-outline-secondary ms-2">
+									<LiaUserEditSolid />
+								</Link>
 								<Button
+									className="ms-2"
 									size="sm"
 									variant="outline-secondary"
 									disabled={activateMutation.isPending}

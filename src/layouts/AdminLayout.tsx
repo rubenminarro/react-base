@@ -13,7 +13,7 @@ const AdminLayout = () => {
                 <Col md={2} className="bg-light border-end p-3">
                     <Nav defaultActiveKey="/dashboard" className="flex-column">
                         <Nav.Link as={Link} to="/dashboard">Dashboard</Nav.Link>
-                        <Nav.Link as={Link} to="/usuarios">Usuarios</Nav.Link>
+                        <Nav.Link as={Link} to="/users">Usuarios</Nav.Link>
                     </Nav>
                 </Col>
                 <Col md={10} className="p-4 overflow-auto">
