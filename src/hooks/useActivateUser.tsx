@@ -7,7 +7,7 @@ export const useActivateUser = () => {
 
 	return useMutation({
 		
-		mutationFn: (userId: number) => api.post(`api/admin/users/${userId}/activate`),
+		mutationFn: (userId: number) => api.post(`api/admin/user/activate/${userId}`),
 
 		onMutate: async (userId: number) => {
 			

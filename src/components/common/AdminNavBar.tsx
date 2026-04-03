@@ -36,10 +36,6 @@ const AdminNavBar = () => {
                             <Nav.Link href="#admin-settings">Configuración</Nav.Link>
                         )}*/}
 
-                        <Nav.Link href="#whatssap">Whatssap</Nav.Link>
-                        <Nav.Link href="#soporte">Soporte</Nav.Link>
-                        <Nav.Link href="#mensajes">Mensajes</Nav.Link>
-
                         <NavDropdown title={user?.name || "Usuario"} id="basic-nav-dropdown">
                             <NavDropdown.Item href="#cambia-contrasena">Cambiar contraseña</NavDropdown.Item>
                             <NavDropdown.Item href="#cambia-idioma">Cambiar idioma</NavDropdown.Item>

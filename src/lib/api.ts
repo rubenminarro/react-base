@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 axios.defaults.withCredentials = true;
 axios.defaults.withXSRFToken = true; 
@@ -22,13 +23,18 @@ api.interceptors.response.use(
     },
     (error) => {
         if (!error.response) {
+            
             console.error("Error de Red: El servidor API no responde.");
             //error.message = "No se pudo establecer conexión con el servidor.";
+
         }
 
         if (error.response && error.response.status === 401) {
+            
             console.warn("Sesión expirada o no autorizado.");
             // Aquí podrías redirigir al login si fuera necesario
+            window.location.href = '/login';
+
         }
 
         return Promise.reject(error);

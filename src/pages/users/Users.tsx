@@ -13,6 +13,8 @@ import { LiaUserEditSolid } from "react-icons/lia";
 interface Usuario {
 	id: number;
 	name: string;
+	first_name: string;
+	last_name: string;
 	email: string;
 	active: number;
 	roles: Role[];
@@ -93,7 +95,7 @@ const Usuarios = () => {
 							<BiSearchAlt />
 						</Button>
 
-						<Link to="/usuarios/nuevo" className="btn btn-light ms-2">
+						<Link to="/user/add" className="btn btn-light ms-2">
 							<LuUserRoundPlus />
 						</Link>
 
@@ -114,7 +116,7 @@ const Usuarios = () => {
 							display: 'flex',
 							justifyContent: 'center',
 							alignItems: 'center',
-							backgroundColor: 'rgba(255, 255, 255, 0.4)', // Fondo semitransparente
+							backgroundColor: 'rgba(255, 255, 255, 0.4)',
 							zIndex: 5,
 						}}
 					>
@@ -128,6 +130,8 @@ const Usuarios = () => {
 						<thead className="table-dark">
 						<tr>
 							<th>Usuario</th>
+							<th>Nombre</th>
+							<th>Apellido</th>
 							<th>Email</th>
 							<th className="text-center">Roles</th>
 							<th className="text-center"></th>
@@ -139,6 +143,8 @@ const Usuarios = () => {
 							
 							<tr key={u.id}>
 							<td>{u.name}</td>
+							<td>{u.first_name}</td>
+							<td>{u.last_name}</td>
 							<td>{u.email}</td>
 							<td>
 								{u.roles.map((role) => (
@@ -167,49 +173,48 @@ const Usuarios = () => {
 						</tbody>
 					</Table>
 
-					{/* --- CONTROLES DE PAGINACIÓN --- */}
-<div className="d-flex justify-content-center mt-3">
-    <Pagination>
-        {/* Ir a la primera página */}
-        <Pagination.First 
-            onClick={() => handlePageChange(1)} 
-            disabled={currentPage === 1 || meta?.lastPage <= 1} 
-        />
-        
-        {/* Página anterior */}
-        <Pagination.Prev 
-            onClick={() => handlePageChange(currentPage - 1)} 
-            disabled={currentPage === 1 || meta?.lastPage <= 1} 
-        />
+					<div className="d-flex justify-content-center mt-3">
+						<Pagination>
+							{/* Ir a la primera página */}
+							<Pagination.First 
+								onClick={() => handlePageChange(1)} 
+								disabled={currentPage === 1 || meta?.lastPage <= 1} 
+							/>
+							
+							{/* Página anterior */}
+							<Pagination.Prev 
+								onClick={() => handlePageChange(currentPage - 1)} 
+								disabled={currentPage === 1 || meta?.lastPage <= 1} 
+							/>
 
-        {/* Números de página */}
-        {meta && [...Array(meta.lastPage)].map((_, idx) => {
-            const pageNumber = idx + 1;
-            return (
-                <Pagination.Item
-                    key={pageNumber}
-                    active={pageNumber === currentPage}
-                    onClick={() => handlePageChange(pageNumber)}
-                    disabled={meta.lastPage <= 1} // Deshabilitado si solo hay 1 página
-                >
-                    {pageNumber}
-                </Pagination.Item>
-            );
-        })}
+							{/* Números de página */}
+							{meta && [...Array(meta.lastPage)].map((_, idx) => {
+								const pageNumber = idx + 1;
+								return (
+									<Pagination.Item
+										key={pageNumber}
+										active={pageNumber === currentPage}
+										onClick={() => handlePageChange(pageNumber)}
+										disabled={meta.lastPage <= 1} // Deshabilitado si solo hay 1 página
+									>
+										{pageNumber}
+									</Pagination.Item>
+								);
+							})}
 
-        {/* Página siguiente */}
-        <Pagination.Next 
-            onClick={() => handlePageChange(currentPage + 1)} 
-            disabled={currentPage === meta?.lastPage || meta?.lastPage <= 1} 
-        />
+							{/* Página siguiente */}
+							<Pagination.Next 
+								onClick={() => handlePageChange(currentPage + 1)} 
+								disabled={currentPage === meta?.lastPage || meta?.lastPage <= 1} 
+							/>
 
-        {/* Ir a la última página */}
-        <Pagination.Last 
-            onClick={() => handlePageChange(meta?.lastPage)} 
-            disabled={currentPage === meta?.lastPage || meta?.lastPage <= 1} 
-        />
-    </Pagination>
-</div>
+							{/* Ir a la última página */}
+							<Pagination.Last 
+								onClick={() => handlePageChange(meta?.lastPage)} 
+								disabled={currentPage === meta?.lastPage || meta?.lastPage <= 1} 
+							/>
+						</Pagination>
+					</div>
 				</div>
 			</div>
 		</div>	
