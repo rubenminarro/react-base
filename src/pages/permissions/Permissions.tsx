@@ -1,36 +1,34 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Table, Spinner, Navbar, Form, Button, Collapse, Badge, Pagination } from 'react-bootstrap';
-import { useSearchStore } from "../../store/useSearchStore";
-import { useUsers } from "../../hooks/useUsers";
-import { useActivateUser } from "../../hooks/useActivateUser";
-import { LuUserRoundPlus } from "react-icons/lu";
+import { Table, Spinner, Navbar, Form, Button, Collapse, Pagination, Toast } from 'react-bootstrap';
+import { usePermissionSearchStore } from "../../store/usePermissionSearchStore";
+import { usePermissions } from "../../hooks/usePermissions";
+import { useActivatePermission } from "../../hooks/useActivatePermission";
 import { BiSearchAlt } from "react-icons/bi";
 import { FaToggleOff } from "react-icons/fa6";
 import { FaToggleOn } from "react-icons/fa";
-import { LiaUserEditSolid } from "react-icons/lia";
+import { MdOutlineRemoveModerator } from "react-icons/md";
+import { MdOutlineAddModerator } from "react-icons/md";
+import { TiEdit } from "react-icons/ti";
 
-interface User {
+
+interface Permission {
 	id: number;
 	name: string;
-	first_name: string;
-	last_name: string;
-	email: string;
+	created_at: string;
+	updated_at: string;
 	active: number;
-	roles: Role[];
 }
 
-interface Role {
-	id: number;
-	name: string;
-}
+const Permissions = () => {
 
-const Users = () => {
-
-  	const { search, setSearch, showSearch, toggleSearch } = useSearchStore();
+  	const { search, setSearch, showSearch, toggleSearch } = usePermissionSearchStore();
 	const [inputValue, setInputValue] = useState(search);
 	const [currentPage, setCurrentPage] = useState(1);
-	const activateMutation = useActivateUser();
+	const activateMutation = useActivatePermission();
+	const [showToast, setShowToast] = useState(false);
+	const [toastMessage, setToastMessage] = useState("");
+	const [toastVariant, setToastVariant] = useState<"success" | "danger">("success");
 	
  	useEffect(() => {
 		
@@ -49,18 +47,32 @@ const Users = () => {
 		}
 	}, [search]);
 
-	const { data, isLoading, isFetching } = useUsers(search, currentPage);
+	const { data, isLoading, isFetching } = usePermissions(search, currentPage);
 
-	const users = data?.data || [];
+	const permissions = data?.data || [];
     const meta = data?.meta?.pagination;
 
 	const handlePageChange = (newPage: number) => {
         setCurrentPage(newPage);
     };
 
-	const activateUser = async (userId: number) => {
-		activateMutation.mutate(userId);
+	const activatePermission = async (permissionId: number) => {
+		activateMutation.mutate(permissionId);
 	}
+
+	useEffect(() => {
+		if (activateMutation.isSuccess) {
+			setToastMessage("Permiso actualizado correctamente");
+			setToastVariant("success");
+			setShowToast(true);
+		}
+
+		if (activateMutation.isError) {
+			setToastMessage("Error al actualizar el permiso");
+			setToastVariant("danger");
+			setShowToast(true);
+		}
+	}, [activateMutation.isSuccess, activateMutation.isError]);
 
 	if (isLoading && !data) {
         return <Spinner animation="border" variant="secondary" className="d-block mx-auto mt-5" />;
@@ -69,41 +81,51 @@ const Users = () => {
 	return (
 		<div>
 
+			{showToast && (
+				
+				<Toast className="text-white mb-3" bg={toastVariant} show={showToast} onClose={() => setShowToast(false)} animation={true} delay={4000} autohide>
+					<Toast.Header>
+						<strong className="me-auto">Atención!</strong>
+					</Toast.Header>
+					<Toast.Body>{toastMessage}</Toast.Body>
+				</Toast>
+			)}
+
 			<Navbar className="mb-3 p-2" expand="lg" bg="secondary" data-bs-theme="light">
 				
 				<Navbar.Brand className="text-white font-weight-bold">
-					Listado de usuarios
+					Listado de permisos
 				</Navbar.Brand>
 
 				<Navbar.Toggle aria-controls="basic-navbar-nav" />
 
-				<Navbar.Collapse className="justify-content-end">
+					<Navbar.Collapse className="justify-content-end">
 
-					<Collapse in={showSearch}>
-						<div>
-							<Form.Control
-							type="text"
-							placeholder="Buscar usuarios..."
-							value={inputValue}
-							onChange={(e) => setInputValue(e.target.value)}
-							autoFocus
-							/>
-						</div>
-					</Collapse>
+						<Collapse in={showSearch}>
+							<div>
+								<Form.Control
+								type="text"
+								placeholder="Buscar permisos..."
+								value={inputValue}
+								onChange={(e) => setInputValue(e.target.value)}
+								autoFocus
+								/>
+							</div>
+						</Collapse>
 
-					<Button
-						variant="light"
-						className="ms-2"
-						onClick={toggleSearch}
-						>
-						<BiSearchAlt />
-					</Button>
+						<Button
+							variant="light"
+							className="ms-2"
+							onClick={toggleSearch}
+							>
+							<BiSearchAlt />
+						</Button>
 
-					<Link to="/user/add" className="btn btn-light ms-2">
-						<LuUserRoundPlus />
-					</Link>
+						<Link to="/permission/add" className="btn btn-light ms-2">
+							<MdOutlineAddModerator />
+						</Link>
 
-				</Navbar.Collapse>
+					</Navbar.Collapse>
 				
 			</Navbar>
 
@@ -132,43 +154,33 @@ const Users = () => {
 
 					<Table striped bordered hover responsive>
 						<thead className="table-dark">
-							<tr>
-								<th>Usuario</th>
-								<th>Nombre</th>
-								<th>Apellido</th>
-								<th>Email</th>
-								<th className="text-center">Roles</th>
-								<th className="text-center"></th>
-							</tr>
+						<tr>
+							<th>Permiso</th>
+							<th>Creado en</th>
+							<th>Actualizado en</th>
+							<th className="text-center"></th>
+						</tr>
 						</thead>
 
 						<tbody>
-						{users?.map((u: User) => (
+						{permissions?.map((p: Permission) => (
 							
-							<tr key={u.id}>
-								<td>{u.name}</td>
-								<td>{u.first_name}</td>
-								<td>{u.last_name}</td>
-								<td>{u.email}</td>
-								<td>
-									{u.roles.map((role) => (
-									<Badge bg="primary" className="me-1" key={role.id}>
-										{role.name}
-									</Badge>
-									))}
-								</td>
+							<tr key={p.id}>
+								<td>{p.name}</td>
+								<td>{p.created_at}</td>
+								<td>{p.updated_at}</td>
 								<td className="text-center">
-									<Link to={`/user/show/${u.id}`} className="btn btn-sm btn-outline-secondary ms-2">
-										<LiaUserEditSolid />
+									<Link to={`/permission/show/${p.id}`} className="btn btn-sm btn-outline-secondary ms-2">
+										<TiEdit />
 									</Link>
 									<Button
 										className="ms-2"
 										size="sm"
 										variant="outline-secondary"
 										disabled={activateMutation.isPending}
-										onClick={() => activateUser(u.id)}
+										onClick={() => activatePermission(p.id)}
 									>
-										{activateMutation.isPending && activateMutation.variables === u.id ? (
+										{activateMutation.isPending && activateMutation.variables === p.id ? (
 											<Spinner
 												as="span"
 												animation="border"
@@ -177,8 +189,15 @@ const Users = () => {
 												aria-hidden="true"
 											/>
 										) : (
-											u.active === 1 ? <FaToggleOn /> : <FaToggleOff />
+											p.active === 1 ? <FaToggleOn /> : <FaToggleOff />
 										)}
+									</Button>
+									<Button
+										className="ms-2"
+										size="sm"
+										variant="outline-secondary"
+									>	
+										<MdOutlineRemoveModerator />
 									</Button>
 								</td>
 							</tr>
@@ -230,8 +249,10 @@ const Users = () => {
 					</div>
 				</div>
 			</div>
-		</div>	
+			
+
+	</div>
 	);
 };
 
-export default Users;
+export default Permissions;

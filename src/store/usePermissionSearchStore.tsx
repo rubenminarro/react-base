@@ -7,7 +7,7 @@ interface SearchStore {
     toggleSearch: () => void;
 }
 
-export const useSearchStore = create<SearchStore>((set) => ({
+export const usePermissionSearchStore = create<SearchStore>((set) => ({
     search: "",
     showSearch: false,
 
