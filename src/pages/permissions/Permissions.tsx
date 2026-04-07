@@ -4,13 +4,13 @@ import { Table, Spinner, Navbar, Form, Button, Collapse, Pagination, Toast } fro
 import { usePermissionSearchStore } from "../../store/usePermissionSearchStore";
 import { usePermissions } from "../../hooks/usePermissions";
 import { useActivatePermission } from "../../hooks/useActivatePermission";
+import { useDeletePermission } from "../../hooks/useDeletePermission";
 import { BiSearchAlt } from "react-icons/bi";
 import { FaToggleOff } from "react-icons/fa6";
 import { FaToggleOn } from "react-icons/fa";
 import { MdOutlineRemoveModerator } from "react-icons/md";
 import { MdOutlineAddModerator } from "react-icons/md";
 import { TiEdit } from "react-icons/ti";
-
 
 interface Permission {
 	id: number;
@@ -22,10 +22,13 @@ interface Permission {
 
 const Permissions = () => {
 
-  	const { search, setSearch, showSearch, toggleSearch } = usePermissionSearchStore();
+  	const {search, setSearch, showSearch, toggleSearch} = usePermissionSearchStore();
 	const [inputValue, setInputValue] = useState(search);
 	const [currentPage, setCurrentPage] = useState(1);
 	const activateMutation = useActivatePermission();
+	const { error: activateError } = activateMutation;
+	const deleteMutation = useDeletePermission();
+	const { error: deleteError } = deleteMutation;
 	const [showToast, setShowToast] = useState(false);
 	const [toastMessage, setToastMessage] = useState("");
 	const [toastVariant, setToastVariant] = useState<"success" | "danger">("success");
@@ -52,6 +55,9 @@ const Permissions = () => {
 	const permissions = data?.data || [];
     const meta = data?.meta?.pagination;
 
+	const getServerError = (error: any) => error?.response?.data?.errors?.name || {};
+	const getServerMessage = (response: any) => response?.data?.message || {};
+
 	const handlePageChange = (newPage: number) => {
         setCurrentPage(newPage);
     };
@@ -60,20 +66,36 @@ const Permissions = () => {
 		activateMutation.mutate(permissionId);
 	}
 
+	const deletePermission = async (permissionId: number) => {
+		deleteMutation.mutate(permissionId);
+	}
+
 	useEffect(() => {
-		if (activateMutation.isSuccess) {
-			setToastMessage("Permiso actualizado correctamente");
+
+		if (deleteMutation.isSuccess || activateMutation.isSuccess) {
+			
+			const currentMessage = getServerMessage(deleteMutation.data || activateMutation.data);
+			
+			setToastMessage(currentMessage);
 			setToastVariant("success");
 			setShowToast(true);
 		}
+		
+		if (deleteMutation.isError || activateMutation.isError) {
 
-		if (activateMutation.isError) {
-			setToastMessage("Error al actualizar el permiso");
+			const currentErrors = getServerError(deleteError || activateError);
+
+			setToastMessage(currentErrors);
 			setToastVariant("danger");
 			setShowToast(true);
 		}
-	}, [activateMutation.isSuccess, activateMutation.isError]);
 
+		deleteMutation.reset()
+		activateMutation.reset()
+	
+	}, [activateMutation.isSuccess, deleteMutation.isSuccess, activateMutation.isError, deleteMutation.isError]);
+
+	
 	if (isLoading && !data) {
         return <Spinner animation="border" variant="secondary" className="d-block mx-auto mt-5" />;
     }
@@ -196,8 +218,20 @@ const Permissions = () => {
 										className="ms-2"
 										size="sm"
 										variant="outline-secondary"
+										disabled={deleteMutation.isPending}
+										onClick={() => deletePermission(p.id)}
 									>	
-										<MdOutlineRemoveModerator />
+										{deleteMutation.isPending && deleteMutation.variables === p.id ? (
+											<Spinner
+												as="span"
+												animation="border"
+												size="sm"
+												role="status"
+												aria-hidden="true"
+											/>
+										) : (
+											<MdOutlineRemoveModerator />
+										)}
 									</Button>
 								</td>
 							</tr>

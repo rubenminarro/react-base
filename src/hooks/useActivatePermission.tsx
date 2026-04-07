@@ -31,11 +31,5 @@ export const useActivatePermission = () => {
 
 			return { previousQueries };
 		},
-
-		onError: (err, permissionId, context) => {
-		context?.previousQueries?.forEach(([queryKey, data]: any) => {
-			queryClient.setQueryData(queryKey, data);
-		});
-		},
 	});
 };
