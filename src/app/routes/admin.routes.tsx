@@ -4,6 +4,7 @@ import AddUser from '../../pages/users/AddUser';
 import ShowUser from '../../pages/users/ShowUser';
 import Permissions from '../../pages/permissions/Permissions';
 import ShowPermission from '../../pages/permissions/ShowPermission';
+import AddPermission from '../../pages/permissions/AddPermission';
 
 export const adminRoutes = [
 	{ index: true, element: <Dashboard /> },
@@ -12,6 +13,6 @@ export const adminRoutes = [
 	{ path: 'user/add', element: <AddUser /> },
 	{ path: 'user/show/:userId', element: <ShowUser /> },
 	{ path: 'permissions', element: <Permissions /> },
-	{ path: 'permission/add', element: <AddUser /> },
+	{ path: 'permission/add', element: <AddPermission /> },
 	{ path: 'permission/show/:permissionId', element: <ShowPermission /> },
 ];

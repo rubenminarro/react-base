@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { api } from '../lib/api';
+import { api } from '../../lib/api';
 
 export const useUsers = (search: string, page: number) => {
   return useQuery({

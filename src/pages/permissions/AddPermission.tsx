@@ -1,39 +1,24 @@
 import { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { Spinner, Navbar, Container, Form, Col,  Row, Button, Toast } from 'react-bootstrap';
-import { usePermission } from '../../hooks/usePermission';
-import { useUpdatePermission } from "../../hooks/useUpdatePermission";
+import { Link } from 'react-router-dom';
+import { Navbar, Container, Form, Col,  Row, Button, Toast } from 'react-bootstrap';
+import { useStorePermission } from "../../hooks/useStorePermission";
 import { FaRegArrowAltCircleLeft } from "react-icons/fa";
-import { MdOutlineAddModerator } from "react-icons/md";
 
-const ShowPermission = () => {
-
-	const { permissionId } = useParams();
-
-	const { permission, isLoading } = usePermission(permissionId);
+const AddPermission = () => {
 
 	const [formData, setFormData] = useState({
 		name: '',
 		guard_name: '',
 	});
 
-	const updateMutation = useUpdatePermission();
-	const { isPending, error } = updateMutation;
+	const storeMutation = useStorePermission();
+	const { isPending, error } = storeMutation;
 
 	const serverErrors = (error as any)?.response?.data?.errors || {};
 
 	const [showToast, setShowToast] = useState(false);
 	const [toastMessage, setToastMessage] = useState("");
 	const [toastVariant, setToastVariant] = useState<"success" | "danger">("success");
-
-	useEffect(() => {
-		if (permission) {
-			setFormData({
-				name: permission.name || '',
-				guard_name: permission.guard_name || ''
-			});
-		}
-	}, [permission]);
 
 	const handleChange = (p: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
 		
@@ -49,7 +34,7 @@ const ShowPermission = () => {
   		
 		p.preventDefault();
 
-		updateMutation.reset(); 
+		storeMutation.reset(); 
    	 	setShowToast(false);
 
 		const payload: any = {
@@ -57,27 +42,24 @@ const ShowPermission = () => {
 			guard_name: formData.guard_name
 		};
 		
-		updateMutation.mutate({
-			id: permissionId!,
-			data: payload
-		});
+		storeMutation.mutate(payload);
 
 	}
 
 	useEffect(() => {
 
-		if (updateMutation.isSuccess) {
+		if (storeMutation.isSuccess) {
 
-			const successMsg = updateMutation.data?.message;
+			const successMsg = storeMutation.data?.message;
 			
 			setToastMessage(successMsg);
 			setToastVariant("success");
 			setShowToast(true);
 		}
 		
-		if (updateMutation.isError) {
+		if (storeMutation.isError) {
 
-			const errorData = (updateMutation.error as any)?.response?.data;
+			const errorData = (storeMutation.error as any)?.response?.data;
         	const errorMsg = errorData?.message;
 
 			setToastMessage(errorMsg);
@@ -85,12 +67,8 @@ const ShowPermission = () => {
 			setShowToast(true);
 		}
 	
-	}, [updateMutation.isSuccess, updateMutation.isError]);
+	}, [storeMutation.isSuccess, storeMutation.isError]);
 	
-	if (isLoading) {
-        return <Spinner animation="border" variant="secondary" className="d-block mx-auto mt-5" />;
-    }
-
 	return (
 		<div>
 
@@ -98,16 +76,12 @@ const ShowPermission = () => {
 				<Container>
 
 					<Navbar.Brand className="text-white font-weight-bold">
-						Datos del permiso
+						Agregar nuevo permiso
 					</Navbar.Brand>
 
 					<Navbar.Toggle aria-controls="basic-navbar-nav" />
 
 					<Navbar.Collapse className="justify-content-end">
-
-						<Link to="/permission/add" className="btn btn-light ms-2">
-							<MdOutlineAddModerator />
-						</Link>
 
 						<Link to="/permissions" className="btn btn-light ms-2">
 							<FaRegArrowAltCircleLeft />
@@ -140,7 +114,7 @@ const ShowPermission = () => {
 								value={formData.name}
 								onChange={(p: any) => { handleChange(p) }}
 								isInvalid={!!serverErrors.name}
-								disabled={updateMutation.isPending}
+								disabled={storeMutation.isPending}
 							/>
 							<Form.Control.Feedback type="invalid">
                                 {serverErrors.name?.[0]}
@@ -153,7 +127,7 @@ const ShowPermission = () => {
 								value={formData.guard_name}
 								onChange={handleChange}
 								isInvalid={!!serverErrors.guard_name}
-								disabled={updateMutation.isPending}
+								disabled={storeMutation.isPending}
 								>
 									<option value="">Seleccione una opción</option>
 									<option value="web">Web</option>
@@ -166,7 +140,7 @@ const ShowPermission = () => {
 							</Col>
 					</Row>
 					<Button variant="primary" type="submit" disabled={isPending}>
-						{isPending ? 'Actualizando...' : 'Actualizar'}
+						{isPending ? 'Guardando...' : 'Guardar'}
 					</Button>
 
 				</Form>
@@ -176,4 +150,4 @@ const ShowPermission = () => {
 	);
 };
 
-export default ShowPermission;
+export default AddPermission;

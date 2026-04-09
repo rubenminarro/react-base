@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Spinner, Navbar, Container, Form, Col,  Row, Button, Alert } from 'react-bootstrap';
-import { useRoles } from "../../hooks/useAddUser";
-import { useStoreUser } from "../../hooks/useStoreUser";
+import { useRoles } from "../../hooks/users/useAddUser";
+import { useStoreUser } from "../../hooks/users/useStoreUser";
 import { FaRegArrowAltCircleLeft } from "react-icons/fa";
 
 interface Role {
@@ -24,7 +24,7 @@ const AddUser = () => {
 		password_confirmation: ''
 	});
 
-  const [selectedRoles, setSelectedRoles] = useState<number[]>([]);
+  	const [selectedRoles, setSelectedRoles] = useState<number[]>([]);
 
 	const { mutate, isPending, isSuccess, isError, error } = useStoreUser();
 

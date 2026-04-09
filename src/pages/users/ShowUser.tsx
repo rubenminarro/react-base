@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Spinner, Navbar, Container, Form, Col,  Row, Button, Alert } from 'react-bootstrap';
-import { useUserWithRoles } from "../../hooks/useUser";
-import { useUpdateUser } from "../../hooks/useUpdateUser";
+import { useUserWithRoles } from "../../hooks/users/useUser";
+import { useUpdateUser } from "../../hooks/users/useUpdateUser";
 import { FaRegArrowAltCircleLeft } from "react-icons/fa";
 import { LuUserRoundPlus } from 'react-icons/lu';
 
