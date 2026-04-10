@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Table, Spinner, Navbar, Form, Button, Collapse, Badge, Pagination } from 'react-bootstrap';
+import { Table, Spinner, Navbar, Form, Button, Collapse, Badge, Pagination, Toast } from 'react-bootstrap';
 import { useSearchStore } from "../../store/useSearchStore";
 import { useUsers } from "../../hooks/users/useUsers";
 import { useActivateUser } from "../../hooks/users/useActivateUser";
@@ -31,6 +31,12 @@ const Users = () => {
 	const [inputValue, setInputValue] = useState(search);
 	const [currentPage, setCurrentPage] = useState(1);
 	const activateMutation = useActivateUser();
+	const [showToast, setShowToast] = useState(false);
+	const [toastMessage, setToastMessage] = useState("");
+	const [toastVariant, setToastVariant] = useState<"success" | "danger">("success");
+
+	const getServerError = (error: any) => error?.response?.data?.errors?.name || {};
+	const getServerMessage = (response: any) => response?.data?.message || {};
 	
  	useEffect(() => {
 		
@@ -62,12 +68,46 @@ const Users = () => {
 		activateMutation.mutate(userId);
 	}
 
+	useEffect(() => {
+
+		if (activateMutation.isSuccess) {
+			
+			const currentMessage = getServerMessage(activateMutation.data);
+			
+			setToastMessage(currentMessage);
+			setToastVariant("success");
+			setShowToast(true);
+		}
+		
+		if (activateMutation.isError) {
+
+			const currentErrors = getServerError(activateMutation.error);
+
+			setToastMessage(currentErrors);
+			setToastVariant("danger");
+			setShowToast(true);
+		}
+
+		activateMutation.reset()
+	
+	}, [activateMutation.isSuccess, activateMutation.isError]);
+
 	if (isLoading && !data) {
         return <Spinner animation="border" variant="secondary" className="d-block mx-auto mt-5" />;
     }
 
 	return (
 		<div>
+
+			{showToast && (
+				
+				<Toast className="text-white mb-3" bg={toastVariant} show={showToast} onClose={() => setShowToast(false)} animation={true} delay={4000} autohide>
+					<Toast.Header>
+						<strong className="me-auto">Atención!</strong>
+					</Toast.Header>
+					<Toast.Body>{toastMessage}</Toast.Body>
+				</Toast>
+			)}
 
 			<Navbar className="mb-3 p-2" expand="lg" bg="secondary" data-bs-theme="light">
 				

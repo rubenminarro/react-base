@@ -78,7 +78,6 @@ const Login = () => {
                 <Form.Group className="mb-3" controlId="formEmail">
                     <Form.Label>Correo electrónico</Form.Label>
                     <Form.Control
-                        required
                         type="email" 
                         placeholder="Ingrese su correo electrónico" 
                         value={email}
@@ -96,7 +95,6 @@ const Login = () => {
                 <Form.Group className="mb-3" controlId="formPassword">
                     <Form.Label>Contraseña</Form.Label>
                     <Form.Control
-                        required
                         type="password" 
                         placeholder="Ingrese su contraseña" 
                         value={password}
@@ -128,7 +126,7 @@ const Login = () => {
                                 aria-hidden="true"
                                 className="me-2"
                             />
-                            Cargando...
+                            Inciando sesión...
                             </>
                         ) : (
                             'Iniciar Sesión'

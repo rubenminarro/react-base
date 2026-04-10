@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Spinner, Navbar, Container, Form, Col,  Row, Button, Toast } from 'react-bootstrap';
-import { usePermission } from '../../hooks/usePermission';
-import { useUpdatePermission } from "../../hooks/useUpdatePermission";
+import { usePermission } from '../../hooks/permissions/usePermission';
+import { useUpdatePermission } from "../../hooks/permissions/useUpdatePermission";
 import { FaRegArrowAltCircleLeft } from "react-icons/fa";
 import { MdOutlineAddModerator } from "react-icons/md";
 
@@ -159,11 +159,10 @@ const ShowPermission = () => {
 									<option value="web">Web</option>
 									<option value="api">API</option>
 								</Form.Select>
-
 							<Form.Control.Feedback type="invalid">
 								{serverErrors.guard_name?.[0]}
 							</Form.Control.Feedback>
-							</Col>
+						</Col>
 					</Row>
 					<Button variant="primary" type="submit" disabled={isPending}>
 						{isPending ? 'Actualizando...' : 'Actualizar'}

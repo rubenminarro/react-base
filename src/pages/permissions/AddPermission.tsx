@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Navbar, Container, Form, Col,  Row, Button, Toast } from 'react-bootstrap';
-import { useStorePermission } from "../../hooks/useStorePermission";
+import { useStorePermission } from "../../hooks/permissions/useStorePermission";
 import { FaRegArrowAltCircleLeft } from "react-icons/fa";
 
 const AddPermission = () => {

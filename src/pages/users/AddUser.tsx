@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Spinner, Navbar, Container, Form, Col,  Row, Button, Alert } from 'react-bootstrap';
+import { Spinner, Navbar, Container, Form, Col,  Row, Button, Toast } from 'react-bootstrap';
 import { useRoles } from "../../hooks/users/useAddUser";
 import { useStoreUser } from "../../hooks/users/useStoreUser";
 import { FaRegArrowAltCircleLeft } from "react-icons/fa";
@@ -15,6 +15,8 @@ const AddUser = () => {
 
 	const { roles, isLoading } = useRoles();
 
+	const [selectedRoles, setSelectedRoles] = useState<number[]>([]);
+
 	const [formData, setFormData] = useState({
 		name: '',
 		first_name: '',
@@ -24,11 +26,14 @@ const AddUser = () => {
 		password_confirmation: ''
 	});
 
-  	const [selectedRoles, setSelectedRoles] = useState<number[]>([]);
-
-	const { mutate, isPending, isSuccess, isError, error } = useStoreUser();
-
+  	const storeMutation = useStoreUser();
+	const { isPending, error } = storeMutation;
+	
 	const serverErrors = (error as any)?.response?.data?.errors || {};
+
+	const [showToast, setShowToast] = useState(false);
+	const [toastMessage, setToastMessage] = useState("");
+	const [toastVariant, setToastVariant] = useState<"success" | "danger">("success");
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		
@@ -50,21 +55,6 @@ const AddUser = () => {
 		
 	};
 
-	useEffect(() => {
-		if (isSuccess) {
-			setFormData({
-				name: '',
-				first_name: '',
-				last_name: '',
-				email: '',
-				password: '',
-				password_confirmation: ''
-			});
-
-			setSelectedRoles([]);
-		}
-	}, [isSuccess]);
-
 	const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
   		
 		e.preventDefault();
@@ -78,9 +68,43 @@ const AddUser = () => {
 			role: selectedRoleNames
 		};
 		
-		mutate(payload);
+		storeMutation.mutate(payload);
 
     };
+
+	useEffect(() => {
+
+		if (storeMutation.isSuccess) {
+
+			const successMsg = storeMutation.data?.message;
+			
+			setToastMessage(successMsg);
+			setToastVariant("success");
+			setShowToast(true);
+
+			setFormData({
+				name: '',
+				first_name: '',
+				last_name: '',
+				email: '',
+				password: '',
+				password_confirmation: ''
+			});
+
+			setSelectedRoles([]);
+		}
+		
+		if (storeMutation.isError) {
+
+			const errorData = (storeMutation.error as any)?.response?.data;
+        	const errorMsg = errorData?.message;
+
+			setToastMessage(errorMsg);
+			setToastVariant("danger");
+			setShowToast(true);
+		}
+	
+	}, [storeMutation.isSuccess, storeMutation.isError]);
 	
 	if (isLoading) {
         return <Spinner animation="border" variant="secondary" className="d-block mx-auto mt-5" />;
@@ -110,18 +134,20 @@ const AddUser = () => {
 
 			<div style={{ position: 'relative', minHeight: '200px' }}>
 
-				{isSuccess && (
-                    <Alert variant="success" className="mt-2">Usuario agregado correctamente</Alert>
-                )}
-
-				{isError && (
-                    <Alert variant="danger" className="mt-2">Hubo un problema al validar los datos.</Alert>
-                )}
+				{showToast && (
+				
+					<Toast className="text-white mb-3" bg={toastVariant} show={showToast} onClose={() => setShowToast(false)} animation={true} delay={4000} autohide>
+						<Toast.Header>
+							<strong className="me-auto">Atención!</strong>
+						</Toast.Header>
+						<Toast.Body>{toastMessage}</Toast.Body>
+					</Toast>
+				)}
 			
 				<Form onSubmit={handleSubmit}>
 					<Row className="mb-3">
 						<Col>
-							<Form.Label>Usuario</Form.Label>
+							<Form.Label className={serverErrors.name ? 'text-danger' : ''}>Usuario</Form.Label>
 							<Form.Control 
 								type="text"
 								name="name"
@@ -129,13 +155,14 @@ const AddUser = () => {
 								value={formData.name}
 								onChange={handleChange}
 								isInvalid={!!serverErrors.name}
+								disabled={storeMutation.isPending}
 							/>
 							<Form.Control.Feedback type="invalid">
                                 {serverErrors.name?.[0]}
                             </Form.Control.Feedback>
 						</Col>
 						<Col>
-							<Form.Label>Email</Form.Label>
+							<Form.Label className={serverErrors.email ? 'text-danger' : ''}>Email</Form.Label>
 							<Form.Control 
 								type="email"
 								name="email"
@@ -143,6 +170,7 @@ const AddUser = () => {
 								value={formData.email}
 								onChange={handleChange}
 								isInvalid={!!serverErrors.email}
+								disabled={storeMutation.isPending}
 							/>
 							<Form.Control.Feedback type="invalid">
                                 {serverErrors.email?.[0]}
@@ -151,7 +179,7 @@ const AddUser = () => {
 					</Row>
 					<Row className="mb-3">
 						<Col>
-							<Form.Label>Nombre</Form.Label>
+							<Form.Label className={serverErrors.first_name ? 'text-danger' : ''}>Nombre</Form.Label>
 							<Form.Control 
 								type="text"
 								name="first_name"
@@ -159,13 +187,14 @@ const AddUser = () => {
 								value={formData.first_name}
 								onChange={handleChange}
 								isInvalid={!!serverErrors.first_name}
+								disabled={storeMutation.isPending}
 							/>
 							<Form.Control.Feedback type="invalid">
                                 {serverErrors.first_name?.[0]}
                             </Form.Control.Feedback>
 						</Col>
 						<Col>
-							<Form.Label>Apellido</Form.Label>
+							<Form.Label className={serverErrors.last_name ? 'text-danger' : ''}>Apellido</Form.Label>
 							<Form.Control 
 								type="text"
 								name="last_name"
@@ -173,6 +202,7 @@ const AddUser = () => {
 								value={formData.last_name}
 								onChange={handleChange}
 								isInvalid={!!serverErrors.last_name}
+								disabled={storeMutation.isPending}
 							/>
 							<Form.Control.Feedback type="invalid">
                                 {serverErrors.last_name?.[0]}
@@ -181,7 +211,7 @@ const AddUser = () => {
 					</Row>
 					<Row className="mb-3">
 						<Col>
-							<Form.Label>Nueva Contraseña</Form.Label>
+							<Form.Label className={serverErrors.password ? 'text-danger' : ''}>Nueva Contraseña</Form.Label>
 							<Form.Control
 								type="password"
 								name="password"
@@ -189,13 +219,14 @@ const AddUser = () => {
 								value={formData.password}
 								onChange={handleChange}
 								isInvalid={!!serverErrors.password}
+								disabled={storeMutation.isPending}
 							/>
 							<Form.Control.Feedback type="invalid">
                                 {serverErrors.password?.[0]}
                             </Form.Control.Feedback>
 						</Col>
 						<Col>
-							<Form.Label>Confirmar Contraseña</Form.Label>
+							<Form.Label className={serverErrors.password_confirmation ? 'text-danger' : ''}>Confirmar Contraseña</Form.Label>
 							 <Form.Control
 								type="password"
 								name="password_confirmation"
@@ -203,6 +234,7 @@ const AddUser = () => {
 								value={formData.password_confirmation}
 								onChange={handleChange}
 								isInvalid={!!serverErrors.password_confirmation}
+								disabled={storeMutation.isPending}
 							/>
 							<Form.Control.Feedback type="invalid">
                                 {serverErrors.password_confirmation?.[0]}
@@ -218,6 +250,7 @@ const AddUser = () => {
 									label={role.name}
                   					checked={selectedRoles.includes(role.id)}
 									onChange={() => handleRoleChange(role.id)}
+									disabled={storeMutation.isPending}
 								/>
 							))}
 							{serverErrors.role && (
