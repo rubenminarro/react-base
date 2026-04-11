@@ -31,11 +31,6 @@ export const useActivateUser = () => {
 
 			return { previousQueries };
 		},
-
-		onError: (err, userId, context) => {
-		context?.previousQueries?.forEach(([queryKey, data]: any) => {
-			queryClient.setQueryData(queryKey, data);
-		});
-		},
+		
 	});
 };

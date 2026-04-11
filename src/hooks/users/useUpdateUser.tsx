@@ -25,7 +25,7 @@ export const useUpdateUser = () => {
 			return response.data;
 		},
 
-		onSuccess: (data, variables) => {
+		onSuccess: (variables) => {
 			//Refresca el usuario actualizado
 			queryClient.invalidateQueries({ queryKey: ['user', variables.id] });
 

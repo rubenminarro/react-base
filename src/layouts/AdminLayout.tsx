@@ -38,6 +38,7 @@ const AdminLayout = () => {
                         <Nav defaultActiveKey="/dashboard" className="flex-column">
                             <Nav.Link as={Link} to="/dashboard">Dashboard</Nav.Link>
                             <Nav.Link as={Link} to="/users">Usuarios</Nav.Link>
+                            <Nav.Link as={Link} to="/roles">Roles</Nav.Link>
                             <Nav.Link as={Link} to="/permissions">Permisos</Nav.Link>
                             <Nav.Link href="#" onClick={handleLogout}>Cerrar sesión</Nav.Link>
                         </Nav>
