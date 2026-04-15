@@ -7,7 +7,7 @@ interface UpdateRolePayload {
         name: string;
         description: string;
         guard_name: string;
-        role: string[];
+        permissions: string[];
     };
 }
 

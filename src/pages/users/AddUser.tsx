@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Spinner, Navbar, Container, Form, Col,  Row, Button, Toast } from 'react-bootstrap';
+import { Spinner, Navbar, Form, Col,  Row, Button, Toast, Badge } from 'react-bootstrap';
 import { useRoles } from "../../hooks/users/useAddUser";
 import { useStoreUser } from "../../hooks/users/useStoreUser";
 import { FaRegArrowAltCircleLeft } from "react-icons/fa";
@@ -113,23 +113,22 @@ const AddUser = () => {
 	return (
 		<div>
 
-			<Navbar className="mb-3" expand="lg" bg="secondary" data-bs-theme="light">
-				<Container>
+			<Navbar className="mb-3 p-2" expand="lg" bg="secondary" data-bs-theme="light">
 
-					<Navbar.Brand className="text-white font-weight-bold">
-						Agregar nuevo usuario
-					</Navbar.Brand>
+				<Navbar.Brand className="text-white font-weight-bold">
+					Agregar nuevo usuario
+				</Navbar.Brand>
 
-					<Navbar.Toggle aria-controls="basic-navbar-nav" />
+				<Navbar.Toggle aria-controls="basic-navbar-nav" />
 
-					<Navbar.Collapse className="justify-content-end">
+				<Navbar.Collapse className="justify-content-end">
 
-						<Link to="/users" className="btn btn-light ms-2">
-							<FaRegArrowAltCircleLeft />
-						</Link>
+					<Link to="/users" className="btn btn-light ms-2">
+						<FaRegArrowAltCircleLeft />
+					</Link>
 
-					</Navbar.Collapse>
-				</Container>
+				</Navbar.Collapse>
+
 			</Navbar>
 
 			<div style={{ position: 'relative', minHeight: '200px' }}>
@@ -243,19 +242,34 @@ const AddUser = () => {
 					</Row>
 					<Row className="mb-3">
 						<Col>
-							<Form.Label className={serverErrors.role ? 'text-danger' : ''}>Roles</Form.Label>
-							{roles.map((role: Role) => (
-								<Form.Check
-									key={role.id}
-									label={role.name}
-                  					checked={selectedRoles.includes(role.id)}
-									onChange={() => handleRoleChange(role.id)}
-									disabled={storeMutation.isPending}
-								/>
-							))}
-							{serverErrors.role && (
-                                <small className="text-danger d-block">{serverErrors.role[0]}</small>
-                            )}
+							<div className="mb-3 d-flex justify-content-between align-items-center border-bottom pb-2">
+								<div>
+									<h5 className={`mb-0 fw-bold ${serverErrors.role ? 'text-danger' : ''}`}>Roles</h5>
+									<small className="text-muted">Seleccioná los roles que tendrá este usuario</small>
+								</div>
+								<Badge pill bg={serverErrors.role ? 'danger' : 'primary'} style={{ fontSize: '0.9rem' }}>
+									{selectedRoles.length} seleccionados
+								</Badge>
+                        	</div>
+
+							<div className={`mb-4 ps-2 border-start border-3 ${serverErrors.role ? 'border-danger-subtle' : 'border-primary-subtle'}`}>
+								<Row>	
+									<Col xs={12} className="py-2 border-bottom border-light">
+										{roles.map((role: Role) => (
+											<Form.Check
+												key={role.id}
+												label={role.name}
+												checked={selectedRoles.includes(role.id)}
+												onChange={() => handleRoleChange(role.id)}
+												disabled={storeMutation.isPending}
+											/>
+										))}
+										{serverErrors.role && (
+											<small className="text-danger d-block">{serverErrors.role[0]}</small>
+										)}
+									</Col>
+								</Row>
+							</div>
 						</Col>
 					</Row>
 					

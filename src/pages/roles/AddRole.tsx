@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Navbar, Form, Row, Col, Button, Toast, Badge, Spinner } from "react-bootstrap";
-import { Link, useParams } from 'react-router-dom';
-import { useRole } from "../../hooks/roles/useRole";
-import { useUpdateRole } from "../../hooks/roles/useUpdateRole";
+import { Link } from 'react-router-dom';
+import { usePermissions } from "../../hooks/roles/usePermissions";
+import { useStoreRole } from "../../hooks/roles/useStoreRole";
 import { FaRegArrowAltCircleLeft } from "react-icons/fa";
-import { MdOutlineAddModerator } from "react-icons/md";
 
 interface PermissionItem {
     id: number;
@@ -17,10 +16,8 @@ interface PermissionGroup {
 }
 
 const ShowRole = () => {
-  
-	const { roleId } = useParams();
 	
-	const { role, permissions, isLoading } = useRole(roleId);
+	const { permissions, isLoading } = usePermissions();
     
 	const [selectedPermissions, setSelectedPermissions] = useState<number[]>([]);
 	
@@ -31,26 +28,14 @@ const ShowRole = () => {
         permissions: [] as number[]
     });
 
-	const updateMutation = useUpdateRole();
-	const { isPending, error } = updateMutation;
+	const storeMutation = useStoreRole();
+	const { isPending, error } = storeMutation;
 	
 	const serverErrors = (error as any)?.response?.data?.errors || {};
 
 	const [showToast, setShowToast] = useState(false);
 	const [toastMessage, setToastMessage] = useState("");
 	const [toastVariant, setToastVariant] = useState<"success" | "danger">("success");
-
-	useEffect(() => {
-        if (role && role.permissions) {
-            setFormData({
-                name: role.name || '',
-                description: role.description || '',
-                guard_name: role.guard_name || '',
-                permissions: role.permissions || []
-            });
-            setSelectedPermissions(role.permissions);
-        }
-    }, [role]);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
 		
@@ -87,26 +72,23 @@ const ShowRole = () => {
 			permissions: selectedPermissionNames
 		};
 
-		updateMutation.mutate({
-			id: roleId,
-			data: payload
-		});
+		storeMutation.mutate(payload);
 	};
 
 	useEffect(() => {
 
-		if (updateMutation.isSuccess) {
+		if (storeMutation.isSuccess) {
 
-			const successMsg = updateMutation.data?.message;
+			const successMsg = storeMutation.data?.message;
 			
 			setToastMessage(successMsg);
 			setToastVariant("success");
 			setShowToast(true);
 		}
 		
-		if (updateMutation.isError) {
+		if (storeMutation.isError) {
 
-			const errorData = (updateMutation.error as any)?.response?.data;
+			const errorData = (storeMutation.error as any)?.response?.data;
         	const errorMsg = errorData?.message;
 
 			setToastMessage(errorMsg);
@@ -114,7 +96,7 @@ const ShowRole = () => {
 			setShowToast(true);
 		}
 	
-	}, [updateMutation.isSuccess, updateMutation.isError]);
+	}, [storeMutation.isSuccess, storeMutation.isError]);
 
 	if (isLoading) {
         return <Spinner animation="border" variant="secondary" className="d-block mx-auto mt-5" />;
@@ -132,10 +114,6 @@ const ShowRole = () => {
 				<Navbar.Toggle aria-controls="basic-navbar-nav" />
 
 				<Navbar.Collapse className="justify-content-end">
-
-					<Link to="/role/add" className="btn btn-light ms-2">
-						<MdOutlineAddModerator />
-					</Link>
 
 					<Link to="/roles" className="btn btn-light ms-2">
 						<FaRegArrowAltCircleLeft />
@@ -167,7 +145,7 @@ const ShowRole = () => {
 								value={formData.name}
 								onChange={(p: any) => { handleChange(p) }}
 								isInvalid={!!serverErrors.name}
-								disabled={updateMutation.isPending}
+								disabled={storeMutation.isPending}
 							/>
 							<Form.Control.Feedback type="invalid">
                                 {serverErrors.name?.[0]}
@@ -180,7 +158,7 @@ const ShowRole = () => {
 								value={formData.guard_name}
 								onChange={handleChange}
 								isInvalid={!!serverErrors.guard_name}
-								disabled={updateMutation.isPending}
+								disabled={storeMutation.isPending}
 								>
 									<option value="">Seleccione una opción</option>
 									<option value="web">Web</option>
@@ -202,7 +180,7 @@ const ShowRole = () => {
 								value={formData.description}
 								onChange={(p: any) => { handleChange(p) }}
 								isInvalid={!!serverErrors.description}
-								disabled={updateMutation.isPending}
+								disabled={storeMutation.isPending}
 							/>
 							<Form.Control.Feedback type="invalid">
                                 {serverErrors.description?.[0]}
@@ -213,25 +191,25 @@ const ShowRole = () => {
 						<Col>
 							<div className="mb-3 d-flex justify-content-between align-items-center border-bottom pb-2">
 								<div>
-									<h5 className="mb-0 fw-bold">Permisos</h5>
+									<h5 className={`mb-0 fw-bold ${serverErrors.permissions ? 'text-danger' : ''}`}>Permisos</h5>
 									<small className="text-muted">Seleccioná los permisos que tendrá este rol</small>
 								</div>
-								<Badge pill bg="primary" style={{ fontSize: '0.9rem' }}>
+								<Badge pill bg={serverErrors.permissions ? 'danger' : 'primary'} style={{ fontSize: '0.9rem' }}>
 									{selectedPermissions.length} seleccionados
 								</Badge>
                         	</div>
 
 							<div className="mt-4">
 								<Row>
-								{permissions.map((group: PermissionGroup) => (
+									{permissions.map((group: PermissionGroup) => (
 									
 										<Col xs={4} key={group.module}>
-											<div key={group.module} className="mb-4 ps-2 border-start border-3 border-primary-subtle">
+											<div key={group.module} className={`mb-4 ps-2 border-start border-3 ${serverErrors.permissions ? 'border-danger-subtle' : 'border-primary-subtle'}`}>
 												<div className="d-flex justify-content-between align-items-center mb-3">
 													<div>
-														<h6 className="text-uppercase fw-bold mb-0 text-primary" style={{ letterSpacing: '1px' }}>{group.module}</h6>
+														<h6 className={`text-uppercase fw-bold mb-0 ${serverErrors.permissions ? 'text-danger' : 'text-primary'}`} style={{ letterSpacing: '1px' }}>{group.module}</h6>
 													</div>
-													<Badge bg="primary" pill>
+													<Badge bg={serverErrors.permissions ? 'danger' : 'primary'} pill>
 														{group.list.filter(p => selectedPermissions.includes(p.id)).length} / {group.list.length}
 													</Badge>
 												</div>
@@ -247,7 +225,7 @@ const ShowRole = () => {
 																	checked={selectedPermissions.includes(permission.id)}
 																	onChange={() => handlePermissionChange(permission.id)}
 																	className="fw-medium"
-																	disabled={updateMutation.isPending}
+																	disabled={storeMutation.isPending}
 																/>
 															</div>
 														</Col>
@@ -261,7 +239,7 @@ const ShowRole = () => {
 						</Col>
 					</Row>
 					<Button variant="primary" type="submit" disabled={isPending}>
-						{isPending ? 'Actualizando...' : 'Actualizar'}
+						{isPending ? 'Guardando...' : 'Guardar'}
 					</Button>
 				</Form>
 			</div>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Spinner, Navbar, Container, Form, Col,  Row, Button, Toast } from 'react-bootstrap';
+import { Spinner, Navbar, Form, Col,  Row, Button, Toast } from 'react-bootstrap';
 import { useUserWithRoles } from "../../hooks/users/useUser";
 import { useUpdateUser } from "../../hooks/users/useUpdateUser";
 import { FaRegArrowAltCircleLeft } from "react-icons/fa";
@@ -130,27 +130,25 @@ const ShowUser = () => {
 	return (
 		<div>
 
-			<Navbar className="mb-3" expand="lg" bg="secondary" data-bs-theme="light">
-				<Container>
+			<Navbar className="mb-3 p-2" expand="lg" bg="secondary" data-bs-theme="light">
+				
+				<Navbar.Brand className="text-white font-weight-bold">
+					Datos del usuario
+				</Navbar.Brand>
 
-					<Navbar.Brand className="text-white font-weight-bold">
-						Datos del usuario
-					</Navbar.Brand>
+				<Navbar.Toggle aria-controls="basic-navbar-nav" />
 
-					<Navbar.Toggle aria-controls="basic-navbar-nav" />
+				<Navbar.Collapse className="justify-content-end">
 
-					<Navbar.Collapse className="justify-content-end">
+					<Link to="/user/add" className="btn btn-light ms-2">
+						<LuUserRoundPlus />
+					</Link>
 
-						<Link to="/user/add" className="btn btn-light ms-2">
-							<LuUserRoundPlus />
-						</Link>
+					<Link to="/users" className="btn btn-light ms-2">
+						<FaRegArrowAltCircleLeft />
+					</Link>
 
-						<Link to="/users" className="btn btn-light ms-2">
-							<FaRegArrowAltCircleLeft />
-						</Link>
-
-					</Navbar.Collapse>
-				</Container>
+				</Navbar.Collapse>
 			</Navbar>
 
 			<div style={{ position: 'relative', minHeight: '200px' }}>

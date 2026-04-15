@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Spinner, Navbar, Container, Form, Col,  Row, Button, Toast } from 'react-bootstrap';
+import { Spinner, Navbar, Form, Col,  Row, Button, Toast } from 'react-bootstrap';
 import { usePermission } from '../../hooks/permissions/usePermission';
 import { useUpdatePermission } from "../../hooks/permissions/useUpdatePermission";
 import { FaRegArrowAltCircleLeft } from "react-icons/fa";
@@ -94,27 +94,26 @@ const ShowPermission = () => {
 	return (
 		<div>
 
-			<Navbar className="mb-3" expand="lg" bg="secondary" data-bs-theme="light">
-				<Container>
+			<Navbar className="mb-3 p-2" expand="lg" bg="secondary" data-bs-theme="light">
+				
+				<Navbar.Brand className="text-white font-weight-bold">
+					Datos del permiso
+				</Navbar.Brand>
 
-					<Navbar.Brand className="text-white font-weight-bold">
-						Datos del permiso
-					</Navbar.Brand>
+				<Navbar.Toggle aria-controls="basic-navbar-nav" />
 
-					<Navbar.Toggle aria-controls="basic-navbar-nav" />
+				<Navbar.Collapse className="justify-content-end">
 
-					<Navbar.Collapse className="justify-content-end">
+					<Link to="/permission/add" className="btn btn-light ms-2">
+						<MdOutlineAddModerator />
+					</Link>
 
-						<Link to="/permission/add" className="btn btn-light ms-2">
-							<MdOutlineAddModerator />
-						</Link>
+					<Link to="/permissions" className="btn btn-light ms-2">
+						<FaRegArrowAltCircleLeft />
+					</Link>
 
-						<Link to="/permissions" className="btn btn-light ms-2">
-							<FaRegArrowAltCircleLeft />
-						</Link>
+				</Navbar.Collapse>
 
-					</Navbar.Collapse>
-				</Container>
 			</Navbar>
 
 			<div style={{ position: 'relative', minHeight: '200px' }}>
